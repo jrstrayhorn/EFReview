@@ -1,1 +1,25 @@
-﻿
+﻿Getting Started
+
+What is Entity Framework?
+	You need a persistence framework to save data to Database
+	Use ADO.NET using SQlConnection, Stored Procedures, Use ADO.NET, Manual Mapping
+	Entity Framework fixes this
+	A persistance framework - no more stored procs, db connection, manual mapping
+
+Workflows
+	Database first
+		Design tables
+		EF generates domain classes
+		Traditional approach for years
+
+	Code First
+		We creat domain class
+		EF generates database tables
+		Still new to devs
+
+	Model first - NOT A FAN
+		We create UML diagram
+		EF generates domain class and database
+
+Gotta Install Entity Framework
+	Nuget Package Manager Console - install-package EntityFramework
