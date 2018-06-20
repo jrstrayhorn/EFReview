@@ -1,1 +1,26 @@
-﻿
+﻿To get going with Code First Workflow of EF:
+
+1. Add Entity Framework via Package Manager Console 'install-package EntityFramework'
+2. Add model class for database table (eg. Post.cs)
+3. Add DB Context class for database abstraction (eg. BlogDbContext.cs)
+	this class should derive from DbContext from System.Data.Entity namespace
+4. In DB Context class add DbSet<T> property for model class (eg. public DbSet<Post> Posts {get; set;})
+5. Add connection string in App.config to database with same name as DB Context class
+	be sure to add attribute providerName="System.Data.SqlClient" to Connection String 
+6. Enable Code First Migrations - this is done only ONCE for the lifetime of the project
+	via Package Manager Console 'enable-migrations'
+
+Steps above are done only once to get project started
+
+After this
+
+You can make changes to model/database going directly to the code
+
+Every time you make changes to model/database code you hvae to generate a migration
+	 using add-migration NAME_OF_CHANGE
+
+7. Generate migration file via package manager console
+	add-migration CreatePost
+
+8. Next you need to run the migration to have database either upgrade or downgrade accordingly
+	PMC: update-database
