@@ -1,1 +1,23 @@
-﻿
+﻿Database First vs Code First
+
+Based on preference
+
+Common Misconceptions
+
+X - Database First gives you more control over database
+	not true - you can do the same in Code First
+
+X - Code First is for green field projects
+	not true - you can reverse engineer current db to make code first
+
+Code First Advantages
+- Full versioning of database
+	can bring to any version with 1 command
+	w/o code first you have to do your own DB versioning
+- Productivity
+	much faster to write code, then using table designers
+	there is learn curve up front
+
+Now where you work there may be a legacy Database and you have to
+use Database first, because you need to script changes and go through
+change process.
