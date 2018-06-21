@@ -47,3 +47,15 @@ and visual details of EDMX file in Visual Studio
 **************************
 Connection Strings
 **************************
+
+Connections strings are located in app.config
+
+web app will be web.config
+
+this is database first workflow noise
+	metadata 3 resources, .csdl, .ssdl, .msl
+	this reference assembly info for Conceptual, Storage model and mapping
+
+connection string is actual connection string to database
+
+
