@@ -1,1 +1,49 @@
-﻿
+﻿Navigation Property
+- a property that helps you navigate from one entity to another
+
+Course can access Author property which is linked to the Author entity
+
+EF supports all kinds of relationship
+	1 to *
+	* to *
+
+**************************
+Uncovering the EDMX
+**************************
+
+EDMX Designer is a visual representation of XML
+
+When viewing XML
+	EF Runtime content
+		includes everything about model
+
+		SSDL content (StorageModel)
+			representation of our database
+			Data about database, tables, columns
+
+		CSDL content (ConceptualModel)
+			representation of our entities
+			Data about entity name, properties
+			we can change our conceptualModel and mapping will update accordingly
+
+		C-S mapping content (Mappings)
+			representation of mapping between those two models storage - conceptual
+			this is essentially the ORM that maps the DB modeling to OO (C#) modeling
+			Table matching to Entity
+				Property to Column mapping
+
+	EF Designer content
+		includes data about visual represetation of EDMX
+		anything visual represent there
+
+To see mapping in EDMX Diagram, right click Entity and select Table Mapping
+	Conceptual mapping
+
+To see storage model, right click on empty area and select Model Browser
+
+EDMX is xml that knows everything about storage model, conceptual model, mapping between two
+and visual details of EDMX file in Visual Studio
+
+**************************
+Connection Strings
+**************************
