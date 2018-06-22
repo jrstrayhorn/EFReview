@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 
 namespace EFReview
 {
+
+    public enum Level : byte
+    {
+        Beginner = 1,
+        Intermediate = 2,
+        Advanced = 3
+    }
+
     class Program
     {
         static void Main(string[] args)
@@ -19,6 +27,11 @@ namespace EFReview
             {
                 Console.WriteLine(c.Title);
             }
+
+            var course = new Course
+            {
+                Level = Level.Beginner // 1 enum is cleaner
+            };
         }
     }
 }

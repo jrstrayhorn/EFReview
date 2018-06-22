@@ -108,6 +108,20 @@ When to use Complex Types?
 	2 or 3 of them for optimization use small complex type
 
 
+*****************************
+Working with Enums
+*****************************
+
+You can map columns in db to enums in code to get rid of magic strings
+and numbers
+
+You can either create a enum in Model and map, or use an existing
+enum in code base and map
+
+Define via Enum Type
+
+
+
 
 
 
