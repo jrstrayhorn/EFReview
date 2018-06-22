@@ -91,6 +91,22 @@ Deleting a table
 when you delete something from database, EF will not automatically
 delete entity or mapping.. you have to manually remove it
 
+****************************
+Function Imports
+****************************
+
+Complex type is a dumb data type without change tracking
+meaning if we make changes to these objects they wont be reflected
+in the database
+	simple data structure for returning data from database
+	any sproc or func creates a complex type
+
+When to use Complex Types?
+- good example, when sproc joins two or more table together
+
+- large tables with lots of columns but sproc only returns
+	2 or 3 of them for optimization use small complex type
+
 
 
 
