@@ -58,4 +58,41 @@ this is database first workflow noise
 
 connection string is actual connection string to database
 
+**************************
+Dealing with Database Changes
+**************************
+
+As we make changes to model, we have to change database 1st
+and then update model in code
+
+Adding a new table
+
+Add in database 1st
+Then in EDMX diagram, right click in open area and select Update Model
+from Database...
+
+Updating a table
+	renaming a column, removing a column
+is tricky b/c although EF picks up the changes in term of creating
+new columns for renamed items..
+
+it will not automatically remove columns from the Entity models
+this is probably by design so that existing code won't break
+you just have to make sure to manually remove column you no longer
+need from Entity model and update any code references to models
+
+if you change a data type for column to something non compatible
+like from int to varchar you have to manually update the table
+mapping as EF would not know how to map varchar to byte/int in
+this case
+
+Deleting a table
+
+when you delete something from database, EF will not automatically
+delete entity or mapping.. you have to manually remove it
+
+
+
+
+
 
