@@ -87,6 +87,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="dbScripts\1-Alter-Videos-Add-GenreID.sql" />
+    <Content Include="dbScripts\2-Update-Videos-With-GenreIds.sql" />
+    <Content Include="dbScripts\3-Add-FK-Relationship-To-Videos.sql" />
+    <Content Include="dbScripts\4-Drop-VideoGenres.sql" />
+    <Content Include="dbScripts\5-Alter-Add-Video-SP.sql" />
     <Content Include="Notes.txt" />
     <Content Include="VidzyModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -102,5 +107,6 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
