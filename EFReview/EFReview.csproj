@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classification.cs" />
     <Compile Include="Genre.cs">
       <DependentUpon>VidzyModel.tt</DependentUpon>
     </Compile>
@@ -92,6 +93,8 @@
     <Content Include="dbScripts\3-Add-FK-Relationship-To-Videos.sql" />
     <Content Include="dbScripts\4-Drop-VideoGenres.sql" />
     <Content Include="dbScripts\5-Alter-Add-Video-SP.sql" />
+    <Content Include="dbScripts\6-Add-Classification-To-Videos.sql" />
+    <Content Include="dbScripts\7-Alter-Add-Video-SP-Add-Classification.sql" />
     <Content Include="Notes.txt" />
     <Content Include="VidzyModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

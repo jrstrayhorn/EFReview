@@ -18,6 +18,7 @@ namespace EFReview
         public string Name { get; set; }
         public System.DateTime ReleaseDate { get; set; }
         public byte GenreId { get; set; }
+        public EFReview.Classification Classification { get; set; }
     
         public virtual Genre Genre { get; set; }
     }
