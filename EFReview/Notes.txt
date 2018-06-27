@@ -1,1 +1,32 @@
-﻿
+﻿Code First with a New Database
+=================================
+
+Remember shortcut for Package Manager Console - Alt+/,Alt+.
+
+1 - Install Entity Framework via Package Manager Console
+	install-package EntityFramework
+
+2 - Create your model with properties (and navigation) and relationships (1 to *, * to *, etc.)
+
+3 - Create DbContext class - abstraction to database connection
+	public class MyDBContext : DbContext (System.Data.Entity)
+
+4 - Create DbSet(s) in DbContext class - represent tables in database
+
+5 - Create Connection String in App.config via <connectionStrings> node
+	Either
+		a) Create Connection string w/ same name as DbContext
+		or
+		b) Create Connection string w/ different name and then create constructor
+			for DbContext that calls base("name=MyConnectionStringName")
+
+6 - Enable Migrations via Package Manager Console (only do this once per project)
+	enable-migrations
+
+7 - Add a migration via Package Manager Console
+	add-migration InitialModel
+
+8 - Run migration on Database via Package Manager Console
+	update-database
+
+
