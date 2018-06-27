@@ -29,4 +29,21 @@ Remember shortcut for Package Manager Console - Alt+/,Alt+.
 8 - Run migration on Database via Package Manager Console
 	update-database
 
+===================================
+Code First with Existing Database
+===================================
+
+Process
+
+Reverse Engineer - Existing DB -> Model
+Use code first for any subsequent changes
+
+Change model then use migrations to bring DB up to date
+
+Benefits
+- Full versioning of the database
+- Less time wated in designers; just write code
+
+
+
 
