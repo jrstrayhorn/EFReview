@@ -21,3 +21,8 @@ Always work on small changes and small migrations
 Big migrations may have errors...
 
 Think like git commit
+
+Modifying an existing column (renaming) is a dangerous
+migration b/c EF will create new column and drop the old column
+w/o copying the data so you have to make sure to copy data yourself
+either with SQL command or change to RenameColumn function
