@@ -1,1 +1,12 @@
-﻿
+﻿Deployment
+You’re ready to deploy the application. Your DBA expects you to provide a
+database script. Run the following command to get a SQL script of all your
+migrations:
+
+Update-Database	-Script	-SourceMigration:0	
+
+This command generates the SQL script from the very first migration to the last
+one. In a real-world scenario, you may want to change the range of migrations
+included in the SQL script in each deployment. To do this, you can use:
+
+Update-Database	-Script	-SourceMigration:Migr1	-TargetMigration:Migr2	

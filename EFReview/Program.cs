@@ -7,12 +7,20 @@ using System.Threading.Tasks;
 
 namespace EFReview
 {
+    public enum Classification
+    {
+        Silver = 1,
+        Gold = 2,
+        Platinum = 3
+    }
+
     public class Video
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public DateTime ReleaseDate { get; set; }
-        public IList<Genre> Genres { get; set; }
+        public Genre Genres { get; set; }
+        public Classification Classification { get; set; }
     }
 
     public class Genre
