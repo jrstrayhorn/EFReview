@@ -26,3 +26,35 @@ Modifying an existing column (renaming) is a dangerous
 migration b/c EF will create new column and drop the old column
 w/o copying the data so you have to make sure to copy data yourself
 either with SQL command or change to RenameColumn function
+
+=====================================
+Downgrading a Database
+=====================================
+
+This would be used if currently working on a new feature but you need
+to go back to a previous commit to work on a hotfix for production
+
+You'd need to downgrade the Database via your migrations back to the version
+that was in production so you can do your work.. 
+
+update-database -TargetMigration:<NameOfMigration>
+
+this will take database back to previous version
+
+Flow here....
+
+In current code, downgrade database to version of db for production
+	update-database -TargetMigration:<NameOfMigration>
+
+checkout production code - perform fixes
+
+commit to production, merge changes to new feature branch
+
+run update-database to return to current version of db
+	update-database
+
+NOTE: Always Go forward or backwards in db version via the latest version of source code
+
+why?
+	we want to restore to previous state, so we have to revert latest db state which is in our current source code
+	if go back to previous version, we won't have latest migration to run down methods
