@@ -15,6 +15,10 @@ Benefits
 
 1. Add ADO.NET Entity Data Model - named MyDBContext
 
+IMPORTANT:  Use add-migration InitialModel -IgnoreChanges -Force
+				-IgnoreChanges tells EF to create migration without existing schema b/c
+					it already exists in database -force overrides existing migration
+
 
 Always work on small changes and small migrations
 
