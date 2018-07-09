@@ -35,7 +35,12 @@ namespace EFReview
             modelBuilder.Entity<Course>()
                     .HasMany(c => c.Tags)
                     .WithMany(t => t.Courses)
-                    .Map(m => m.ToTable("CourseTags"));
+                    .Map(m => 
+                    {
+                        m.ToTable("CourseTags");
+                        m.MapLeftKey("CourseId");
+                        m.MapRightKey("TagId");
+                    });
 
             modelBuilder.Entity<Course>()
                     .HasRequired(c => c.Cover)
