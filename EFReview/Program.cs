@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace EFReview
 {
-    public enum Classification
+    public enum Classification : byte
     {
         Silver = 1,
         Gold = 2,
