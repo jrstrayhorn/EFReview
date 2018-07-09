@@ -1,1 +1,125 @@
-﻿
+﻿Fluent API
+
+Basics
+
+protected overried void OnModelCreating(DbModelBuilder modelBuilder)
+{
+	// Apply configuration using Fluent API
+}
+
+ran when DbContext is being created
+
+// Entity method, generic takes target type
+
+Changing Schema
+
+modelBuilder.Entity<Course>()
+	.ToTable("tbl_Course", "catalog");
+
+Primary keys
+
+modelBuilder.Entity<Book>()
+			.HasKey(t => t.ISBN);
+
+Composite Keys
+
+modelBuilder.Entity<Book>()
+			.HasKey(t => new { t.OrderId, t.OrderItemId });
+
+Column Names
+
+modelBuilder.Entity<Course>
+			.Property(t => t.Name)
+			.HasColumnName("sName");
+
+Column Types
+
+modelBuilder.Entity<Course>
+			.Property(t => t.Name)
+			.HasColumnType("varchar");
+
+Column Orders
+
+			.HasColumnOrder(2);
+
+Turn off Identity Column
+			.HasDatabaseGeneratedOptions(DatabaseGenrateOption.None)
+
+Nulls
+			.IsRequired();
+
+Length of Strings
+			.HasMaxLength(255)
+			.IsMaxLength();
+
+Relationships
+
+Type1 -> Type2
+
+HasMany() - if type1 has many of type2
+HasRequired() - if type1 has only 1 of type2
+HasOptional() - if type1 has 0 or 1 of type2
+
+Have to confirm Reverse direction has to be set as well
+
+WithMany()
+WithRequired()
+WithOptional()
+
+One to Many
+
+Author (1) to (*) Course
+
+modelBuilder
+	.Entity<Author>()
+	.HasMany(a => a.Courses)
+	.WithRequired(c => c.Author)
+	.HasForeignKey(c => c.AuthorId)
+
+Many to Many
+
+Course (*) to (*) Tag
+
+modelBuilder
+	.Entity<Course>()
+	.HasMany(c => c.Tags)
+	.WithMany(t => t.Courses)
+	.Map(m => m.ToTable("CourseTags"))  // rename intermediary table
+
+// would write only if you need additional configuration for this many to many
+
+One to Zero/One
+
+Course (1) to 0..1 Caption
+
+modelBuilder
+	.Entity<Course>()
+	.HasOptional(c => c.Caption)
+	.WithRequired(c => c.Course)
+
+Start with Has method then call With method
+
+One to One (Tricky)
+
+Principal		Dependent
+Course (1) to (1) Cover
+
+modelBuidler
+	.Entity<Course>()
+	.HasRequired(c => c.Cover)
+	.WithRequiredPrincipal(c => c.Course)
+
+	can't use HasRequired and WithRequired
+
+	EF needs to know who is Parent vs Child
+
+	gotta use WithRequiredPrincipla or WithRequiredDependent
+
+	principal - parent
+	dependant - child
+
+modelBuilder
+	.Entity<Cover>()
+	.HasRequired(c => c.Course)
+	.WithRequiredDependent(c => c.Cover)
+
