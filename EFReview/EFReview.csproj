@@ -92,6 +92,7 @@
   <ItemGroup>
     <Content Include="DeployScript\InitialDeployment.sql" />
     <Content Include="DeployScript\ScriptAfter4thIteration.sql" />
+    <Content Include="DeployScript\ScriptAfter5thIteration.sql" />
     <Content Include="Notes.txt" />
   </ItemGroup>
   <ItemGroup>
