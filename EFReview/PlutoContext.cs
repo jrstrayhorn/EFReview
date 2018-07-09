@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+﻿using EFReview.EntityConfigurations;
+using System.Data.Entity;
 
 namespace EFReview
 {
@@ -16,7 +17,7 @@ namespace EFReview
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            
+            modelBuilder.Configurations.Add(new CourseConfiguration());
         }
     }
 }
