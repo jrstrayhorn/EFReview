@@ -21,15 +21,25 @@ namespace EFReview.Migrations
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
-                        Name = c.String(),
-                        Description = c.String(),
+                        Name = c.String(nullable: false, maxLength: 255),
+                        Description = c.String(nullable: false, maxLength: 2000),
                         Level = c.Int(nullable: false),
                         FullPrice = c.Single(nullable: false),
-                        Author_Id = c.Int(),
+                        AuthorId = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Authors", t => t.Author_Id)
-                .Index(t => t.Author_Id);
+                .ForeignKey("dbo.Authors", t => t.AuthorId)
+                .Index(t => t.AuthorId);
+            
+            CreateTable(
+                "dbo.Covers",
+                c => new
+                    {
+                        Id = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.Courses", t => t.Id)
+                .Index(t => t.Id);
             
             CreateTable(
                 "dbo.Tags",
@@ -41,30 +51,33 @@ namespace EFReview.Migrations
                 .PrimaryKey(t => t.Id);
             
             CreateTable(
-                "dbo.TagCourses",
+                "dbo.CourseTags",
                 c => new
                     {
-                        Tag_Id = c.Int(nullable: false),
                         Course_Id = c.Int(nullable: false),
+                        Tag_Id = c.Int(nullable: false),
                     })
-                .PrimaryKey(t => new { t.Tag_Id, t.Course_Id })
-                .ForeignKey("dbo.Tags", t => t.Tag_Id, cascadeDelete: true)
+                .PrimaryKey(t => new { t.Course_Id, t.Tag_Id })
                 .ForeignKey("dbo.Courses", t => t.Course_Id, cascadeDelete: true)
-                .Index(t => t.Tag_Id)
-                .Index(t => t.Course_Id);
+                .ForeignKey("dbo.Tags", t => t.Tag_Id, cascadeDelete: true)
+                .Index(t => t.Course_Id)
+                .Index(t => t.Tag_Id);
             
         }
         
         public override void Down()
         {
-            DropForeignKey("dbo.TagCourses", "Course_Id", "dbo.Courses");
-            DropForeignKey("dbo.TagCourses", "Tag_Id", "dbo.Tags");
-            DropForeignKey("dbo.Courses", "Author_Id", "dbo.Authors");
-            DropIndex("dbo.TagCourses", new[] { "Course_Id" });
-            DropIndex("dbo.TagCourses", new[] { "Tag_Id" });
-            DropIndex("dbo.Courses", new[] { "Author_Id" });
-            DropTable("dbo.TagCourses");
+            DropForeignKey("dbo.CourseTags", "Tag_Id", "dbo.Tags");
+            DropForeignKey("dbo.CourseTags", "Course_Id", "dbo.Courses");
+            DropForeignKey("dbo.Covers", "Id", "dbo.Courses");
+            DropForeignKey("dbo.Courses", "AuthorId", "dbo.Authors");
+            DropIndex("dbo.CourseTags", new[] { "Tag_Id" });
+            DropIndex("dbo.CourseTags", new[] { "Course_Id" });
+            DropIndex("dbo.Covers", new[] { "Id" });
+            DropIndex("dbo.Courses", new[] { "AuthorId" });
+            DropTable("dbo.CourseTags");
             DropTable("dbo.Tags");
+            DropTable("dbo.Covers");
             DropTable("dbo.Courses");
             DropTable("dbo.Authors");
         }
