@@ -1,1 +1,32 @@
-﻿
+﻿What is LINQ?
+	Language INtegrated Query
+	used to bridge the gap between objects and data
+
+LINQ
+	can query
+		Objects in Memory - find, sort, etc
+		XML
+		Relational DBs (SQL)
+		NoSQL DBs (Mongo)
+	same programming model for all
+
+Before LINQ
+	needed T-SQL or PL/SQL or XQuery
+
+After LINQ
+	use same model for all data stores
+	query automatically translated for that data store
+
+Benefits
+	No more SQL queries / sprocs (you may still need to write some though)
+	Increased productivity
+
+LINQ is for simple queries
+
+If you need more than or complex query write a stored procedure
+
+Everything has its place
+
+There are some instance when you want to use LINQ
+and
+Then some instances when you want to use T-SQL Stored Procedures
