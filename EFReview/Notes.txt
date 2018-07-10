@@ -30,3 +30,50 @@ Everything has its place
 There are some instance when you want to use LINQ
 and
 Then some instances when you want to use T-SQL Stored Procedures
+
+Grouping in LINQ is different from Grouping in SQL
+
+In SQL, grouping is used with aggregate functions like count, sum, etc
+
+In LINQ, grouping is used to group objects by particular prop
+	w/o the use of aggregate functions
+
+For instance,
+	if grouping Courses by their level, you would get back
+	Course objects grouped by their Level with a Key
+		Key = 1 (Level 1 Course objects)
+		Key = 2 (Level 2 Course objects)
+		Key = 3 (Level 3 Course objects)
+
+Joining
+
+in LINQ, 3 types of joins
+Inner Join - similar to SQL
+
+	used to join two tables together
+
+	Courses and Author
+
+	can display list of courses and author
+
+	you can use navigation property to display related entity
+
+Group Join
+
+	imagine two list
+	associate each object on left with one or more matching objects on right
+
+	left join with aggreate
+	for example,
+		get list of Authors with count of their courses
+		in SQL
+			SELECT A.Name, COUNT(*)
+			FROM Authors A
+			LEFT JOIN Courses C
+				ON A.AuthorID = C.AuthorID
+			GROUP BY A.Name
+
+Cross Join - similar to SQL
+	same as SQL
+
+
