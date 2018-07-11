@@ -126,6 +126,111 @@ namespace EFReview
             {
                 Console.WriteLine($"{x.AuthorName} - {x.CourseName}");
             }
+
+
+            // LINQ Extension Methods
+
+            // all courses level 1
+            // Restriction, Ordering, Projection
+            var courses = context.Courses
+                .Where(c => c.Level == 1)
+                .OrderByDescending(c => c.Name)
+                .ThenBy(c => c.Level)
+                .Select(c => new { CourseName = c.Name, AuthorName = c.Author.Name });
+
+            // Projection - flatten hierarchial data
+            var tags = context.Courses
+                .Where(c => c.Level == 1)
+                .OrderByDescending(c => c.Name)
+                .ThenByDescending(c => c.Level)
+                .SelectMany(c => c.Tags)
+                .Distinct();
+
+            foreach (var t in tags)
+            {
+                Console.WriteLine(t.Name);
+            }
+
+            // set operation  - distinct
+
+            // Grouping
+            var groups = context.Courses
+                .GroupBy(c => c.Level);
+
+            foreach (var group in groups)
+            {
+                Console.WriteLine($"Key: {group.Key}");
+
+                // Order each grouping of items by name
+                foreach (var course in group.OrderBy(c => c.Name))
+                {
+                    Console.WriteLine($"\t{course.Name}");
+                }
+            }
+
+            // Joining
+
+            // Inner Join when no relationship between entities
+            // if relationship use navigation property
+            var innerJoinCourseAuthor = context.Courses.Join(context.Authors, 
+                c => c.AuthorId, 
+                a => a.Id, 
+                (course, author) => new
+                    {
+                        CourseName = course.Name,
+                        AuthorName = author.Name
+                    });
+
+            // Group Join
+            var groupJoinAuthorCourses = context.Authors.GroupJoin(context.Courses, 
+                a => a.Id, 
+                c => c.AuthorId,
+                (author, authorCourses) => new
+                {
+                    AuthorName = author.Name,
+                    CourseCount = authorCourses.Count()
+                });
+
+            // Cross Join
+            // this is select many
+            // author courses combined
+            context.Authors.SelectMany(a => context.Courses, (author, course) => new
+            {
+                AuthorName = author.Name,
+                CourseName = course.Name
+            });
+
+            // LINQ Extension Methods - Additonal Methods not support in Query syntax
+            // Partitioning
+            // for a page of records, size of 10
+            var courseSecondPage = context.Courses.Skip(10).Take(10);
+
+            // Element Operators
+            // what if you want a single object instead of a list
+            context.Courses.OrderBy(c => c.Level).First(c => c.FullPrice > 100);
+
+            // first will give exception if null
+            // firstOrDefault will return null if no records
+            // this has overloads so you can use with or without lambda expression
+
+            // can use this with SQL - context.Courses.Last
+            // sort descending then get first
+
+            // if expression returns more than 1 you'll get an exception below
+            context.Courses.SingleOrDefault(c => c.Id == 1);
+
+            // Quantifying - all return boolean
+            var allAbove10Dollars = context.Courses.All(c => c.FullPrice > 10);
+
+            var anyLevel1Courses = context.Courses.Any(c => c.Level == 1);
+
+            // Aggregating
+            var count = context.Courses.Where(c => c.Level == 1).Count();
+
+            // also have avg, sum, max and min
+            context.Courses.Max(c => c.FullPrice);
+            context.Courses.Min(c => c.FullPrice);
+            context.Courses.Average(c => c.FullPrice);
         }
     }
 }
