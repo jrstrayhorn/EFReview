@@ -1,114 +1,110 @@
-﻿What is LINQ?
-	Language INtegrated Query
-	used to bridge the gap between objects and data
+﻿Loading Related Objects
 
-LINQ
-	can query
-		Objects in Memory - find, sort, etc
-		XML
-		Relational DBs (SQL)
-		NoSQL DBs (Mongo)
-	same programming model for all
+There are 3 ways -
+	- Lazy Loading
+	- Eager Loading
+	- Explicit Loading
 
-Before LINQ
-	needed T-SQL or PL/SQL or XQuery
+In order to get lazy loading you have to setup your navigational properties like so...
+	public virtual ICollection<Tag> Tags { get; set; }
 
-After LINQ
-	use same model for all data stores
-	query automatically translated for that data store
+At runtime EF creates dynamic proxy
+CourseProxy - class looks like original Coure call.. will override tag property like so..
 
-Benefits
-	No more SQL queries / sprocs (you may still need to write some though)
-	Increased productivity
+if (_tags == null)
+	_tags = context.LoadTags();
 
-LINQ is for simple queries
+	return _tags;
 
-If you need more than or complex query write a stored procedure
+1st time access because null will be initialized any time after
+we will get in memory tags
 
-Everything has its place
+In Debug, EF will load related items via lazy loading
 
-There are some instance when you want to use LINQ
-and
-Then some instances when you want to use T-SQL Stored Procedures
+Best Practices
+- Use when loading an object graph is costly (a delay in app startup)
+	- use lazy loading to only load main objects then load related objects when necessary
+- Avoid in web applications
+	- Because we always get new request/response data.. will cause unnessary round trip
+	- Disable lazy load by setting to NOT be virtual
 
-Grouping in LINQ is different from Grouping in SQL
+To turn off in DbContext do this,
+	in constructor of DbContext,
 
-In SQL, grouping is used with aggregate functions like count, sum, etc
+	this.Configuration.LazyLoadingEnabled = false;
 
-In LINQ, grouping is used to group objects by particular prop
-	w/o the use of aggregate functions
+Avoid using virtual to define related objects
 
-For instance,
-	if grouping Courses by their level, you would get back
-	Course objects grouped by their Level with a Key
-		Key = 1 (Level 1 Course objects)
-		Key = 2 (Level 2 Course objects)
-		Key = 3 (Level 3 Course objects)
+=============================
+N + 1 Issue
+=============================
 
-Joining
+N + 1 - To get N entites and their related entites, we'l end up with N + 1 queries
 
-in LINQ, 3 types of joins
-Inner Join - similar to SQL
+How this happens:
+	Use EF to get all courses like this context.Courses.ToList();
 
-	used to join two tables together
+	Then iterate over the courses and get Author name like this
+		foreach (var course in Courses)
+			course.Author.Name
+	For each course item there will be another call to Database to get author info
+		because Lazy Loading is turned on and we don't have Author info during initial Courses call
 
-	Courses and Author
+Be careful with Lazy Loading.. watch out for unnecessary queries
 
-	can display list of courses and author
+===============================
+Eager Loading
+==============================
 
-	you can use navigation property to display related entity
+Is opposite of Lazy Loading to prevent additioanl queries from Database
 
-Group Join
+HOw to do:
+	var courses = context.Courses.Include("Author").ToList();
+		the query will join the courses table to get courses and authors
+		but this is a bad coding practice because of magic string
 
-	imagine two list
-	associate each object on left with one or more matching objects on right
+	Better way
+	using System.Data.Entity;
 
-	left join with aggreate
-	for example,
-		get list of Authors with count of their courses
-		in SQL
-			SELECT A.Name, COUNT(*)
-			FROM Authors A
-			LEFT JOIN Courses C
-				ON A.AuthorID = C.AuthorID
-			GROUP BY A.Name
+	var courses = context.Courses.Include(c => c.Author).ToList();
 
-Cross Join - similar to SQL
-	same as SQL
+Multiple Levels
 
-=======================================
-Deferred Execution
-=======================================
+// all courses with their authors
+// for single properties
+context.Courses.Include(c => c.Author.Address);
 
-Queries are not execxuted at the time you create them
+// for collection properties
+context.Courses.Include(a => a.Tags.Select(t => t.Moderator));
 
-Query executed when
+can be good and bad
 
-- Iterating over query variable
-- Calling ToList, ToArray, ToDictionary
-- Calling First, Last, Single, Count, Max, Min, Average
+Too Many Includes is BAD.. storing object that you don't need
 
-What are benefits
+Decide when to use Eager vs Lazy Loading
 
-- Deferred execution allows queries to be extended
+=================================
+Explicit Loading
+=================================
+ 
+Eager Loading
+- Uses JOINS
+- One Round-Trip
 
-======================================
-IQueryable
-======================================
+Explicit
+- Separarte queries
+- Multiple Round-Trips
 
-IQueryable is an interface that derives from IEnumerable
+// MSDN way
+context.Entry(author).Collection(a => a.Courses).Load();
 
-IEnumerable - represents an object that can be enumerated
-				eg. string, array, list, dictionary
-				can iterate over them using a foreach block
+// MOSH way
+context.Courses.Where(c => c.AuthorId == author.Id && c.FullPrice == 0).Load();
 
-difference between
+var authors = context.Authors.ToList();
+var authorIds = authors.Select(a => a.Id);
 
-IQueryable
-	allows queries to be extended without being executed
-	this is because each part of LINQ statement is started in expression object
-	that can be added to until an action is taken that calls executes the query.
+context.Courses.Where(c => authorIds.Contains(c.AuthorId) && c.FullPrice == 0).Load();
 
-IEnumerable
-	queries are called immediately
+
 
