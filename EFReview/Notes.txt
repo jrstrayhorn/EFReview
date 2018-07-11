@@ -76,4 +76,39 @@ Group Join
 Cross Join - similar to SQL
 	same as SQL
 
+=======================================
+Deferred Execution
+=======================================
+
+Queries are not execxuted at the time you create them
+
+Query executed when
+
+- Iterating over query variable
+- Calling ToList, ToArray, ToDictionary
+- Calling First, Last, Single, Count, Max, Min, Average
+
+What are benefits
+
+- Deferred execution allows queries to be extended
+
+======================================
+IQueryable
+======================================
+
+IQueryable is an interface that derives from IEnumerable
+
+IEnumerable - represents an object that can be enumerated
+				eg. string, array, list, dictionary
+				can iterate over them using a foreach block
+
+difference between
+
+IQueryable
+	allows queries to be extended without being executed
+	this is because each part of LINQ statement is started in expression object
+	that can be added to until an action is taken that calls executes the query.
+
+IEnumerable
+	queries are called immediately
 

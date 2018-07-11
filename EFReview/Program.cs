@@ -231,6 +231,27 @@ namespace EFReview
             context.Courses.Max(c => c.FullPrice);
             context.Courses.Min(c => c.FullPrice);
             context.Courses.Average(c => c.FullPrice);
+
+            // DEFERRED EXECUTION
+            // query is executed and brought into memory
+            // this impacts performance though....
+            // because you bring in all records into memory
+            // instead of just the records that you need
+            var allCourses = context.Courses.ToList();
+
+            var beginnerCourses = allCourses.Where(c => c.IsBeginnerCourse);
+            //var filtered = allCourses.Where(c => c.Level == 1);
+            //var sorted = filtered.OrderBy(c => c.Name);
+
+            foreach (var c in allCourses)
+            {
+                Console.WriteLine(c.Name);
+            }
+
+            // Queries are not execxuted at the time you create them
+
+            // Query 
+        
         }
     }
 }
