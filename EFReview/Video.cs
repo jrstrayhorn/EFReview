@@ -10,7 +10,7 @@ namespace EFReview
         public string Name { get; set; }
         public DateTime ReleaseDate { get; set; }
         public byte GenreId { get; set; }
-        public Genre Genres { get; set; }
+        public virtual Genre Genres { get; set; }
         public Classification Classification { get; set; }
         public IList<Tag> Tags { get; set; }
     }

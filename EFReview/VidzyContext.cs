@@ -8,6 +8,12 @@ namespace EFReview
         public DbSet<Video> Videos { get; set; }
         public DbSet<Genre> Genres { get; set; }
 
+        public VidzyContext()
+        {
+            // turning off lazy loading
+            Configuration.LazyLoadingEnabled = false;
+        }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Configurations.Add(new VideoConfiguration());

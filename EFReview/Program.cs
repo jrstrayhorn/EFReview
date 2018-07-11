@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Data.Entity;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,81 +14,49 @@ namespace EFReview
         {
             var context = new VidzyContext();
 
-            Console.WriteLine("***Action movies sorted by name");
+            //var allVideos = context.Videos.ToList();
 
-            var actionMovies = context.Videos
-                .Where(v => v.Genres.Name == "Action")
-                .OrderBy(v => v.Name);
+            //foreach (var v in allVideos)
+            //{
+            //    // this causes a null reference exception
+            //    // why? Because you didn't eager load the videos
+            //    // with their genres and lazy loading is not on currently
+            //    Console.WriteLine($"Name: {v.Name}, Genre: {v.Genres.Name}");
+            //}
 
-            foreach (var v in actionMovies)
+            //// Setting Genre to virtual gets this to work now
+            //// but we've introduced the N + 1 issue
+            //// where EF is making N + 1 calls to database
+            //// 1 to get all videos then 1 call per video being iterated
+            //// to get genre
+            //var allVideos = context.Videos.ToList();
+
+            //foreach (var v in allVideos)
+            //{
+            //    Console.WriteLine($"Name: {v.Name}, Genre: {v.Genres.Name}");
+            //}
+
+            // turned off lazy loading via constructor of dbContext
+            // so above will fail with null exception
+            // using eager loading now to solve N + 1 issue
+            //var allVideos = context.Videos.Include(v => v.Genres).ToList();
+
+            //// with eager loading enabled this will now work
+            //foreach (var v in allVideos)
+            //{
+            //    Console.WriteLine($"Name: {v.Name}, Genre: {v.Genres.Name}");
+            //}
+
+            // using explicit loading to solve N+1 issue
+            var allVideos = context.Videos.ToList();
+            var genreIds = allVideos.Select(v => v.GenreId);
+
+            context.Genres.Where(g => genreIds.Contains(g.Id)).Load();
+
+            // with explicit loading enabled this will now work
+            foreach (var v in allVideos)
             {
-                Console.WriteLine($"\t{v.Name}");
-            }
-
-            Console.WriteLine("***Gold drama movies sorted by release date (newest first)");
-
-            var goldDramaMovies = context.Videos
-                .Where(v => v.Genres.Name == "Drama" && v.Classification == Classification.Gold)
-                .OrderByDescending(v => v.ReleaseDate);
-
-            foreach (var v in goldDramaMovies)
-            {
-                Console.WriteLine($"\t{v.Name}");
-            }
-
-            Console.WriteLine("***All movies projected into an anonymous type with two properties: MovieName and Genre");
-
-            var allMovieNameGenre = context.Videos
-                .Select(v => new { MovieName = v.Name, Genre = v.Genres.Name });
-
-            foreach (var item in allMovieNameGenre)
-            {
-                Console.WriteLine($"\t - Movie Name: {item.MovieName}, Genre: {item.Genre}");
-            }
-
-            Console.WriteLine("***All movies grouped by their classification");
-
-            var allMoviesGroupedByClassification = context.Videos
-                .GroupBy(v => v.Classification)
-                .Select(g => new { Classification = g.Key.ToString(), Movies = (IEnumerable<Video>)g });
-
-            foreach (var g in allMoviesGroupedByClassification)
-            {
-                Console.WriteLine($"Classification: {g.Classification}");
-
-                foreach (var v in g.Movies.OrderBy(v => v.Name))
-                {
-                    Console.WriteLine($"\t{v.Name}");
-                }
-            }
-
-            Console.WriteLine("***List of classifications sorted alphabetically and count of videos in them.");
-
-            var classificationMovieCount = context.Videos
-                .GroupBy(v => v.Classification.ToString())
-                .OrderBy(g => g.Key);
-
-            foreach (var g in classificationMovieCount)
-            {
-                Console.WriteLine($"\t{g.Key} ({g.Count()})");
-            }
-
-            Console.WriteLine("***List of genres and number of videos they include, sorted by the number of videos. Genres with the highest number of videos come first.");
-
-            var genreGroupJoinVideos = context.Genres
-                .GroupJoin(context.Videos,
-                g => g.Id,
-                v => v.GenreId,
-                (genre, genreVideos) => new
-                {
-                    GenreName = genre.Name,
-                    VideoCount = genreVideos.Count()
-                })
-                .OrderByDescending(gv => gv.VideoCount);
-
-            foreach (var gv in genreGroupJoinVideos)
-            {
-                Console.WriteLine($"\t{gv.GenreName} ({gv.VideoCount})");
+                Console.WriteLine($"Name: {v.Name}, Genre: {v.Genres.Name}");
             }
         }
     }
