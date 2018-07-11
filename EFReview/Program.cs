@@ -74,12 +74,20 @@ namespace EFReview
 
             Console.WriteLine("***List of genres and number of videos they include, sorted by the number of videos. Genres with the highest number of videos come first.");
 
-            var genreVideos = context.Genres
-                .OrderByDescending(g => g.Videos.Count);
+            var genreGroupJoinVideos = context.Genres
+                .GroupJoin(context.Videos,
+                g => g.Id,
+                v => v.GenreId,
+                (genre, genreVideos) => new
+                {
+                    GenreName = genre.Name,
+                    VideoCount = genreVideos.Count()
+                })
+                .OrderByDescending(gv => gv.VideoCount);
 
-            foreach (var g in genreVideos)
+            foreach (var gv in genreGroupJoinVideos)
             {
-                Console.WriteLine($"\t{g.Name} ({g.Videos.Count})");
+                Console.WriteLine($"\t{gv.GenreName} ({gv.VideoCount})");
             }
         }
     }
