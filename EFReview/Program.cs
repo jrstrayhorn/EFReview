@@ -51,7 +51,7 @@ namespace EFReview
                 // author object and put into memory
 
                 // foreign key approach
-                //AuthorId = 1
+                AuthorId = 1
                 // in web app, DbContext is short lived, create context and dispose
 
                 // a third way, not common, don't use this
@@ -60,51 +60,53 @@ namespace EFReview
 
             context.Courses.Add(course);
 
-            var courseToEdit = context.Courses.Find(4); // same as Single(c => c.Id == 4)
-                // can also pass and find by composite keys like .Find(4, 1);
-            courseToEdit.Name = "New Name";
-            courseToEdit.AuthorId = 2;
-
-            // you have to load object 1st, before you can change them
-            // because ChangeTracker needs the object to update state
-
-            var courseToRemove = context.Courses.Find(6);
-            context.Courses.Remove(courseToRemove);
-
-            //var authorToRemove = context.Authors.Find(2);
-            // if you want to remove author you have to bring in Courses as well.
-            var authorToRemove = context.Authors
-                .Include(a => a.Courses)
-                .Single(a => a.Id == 2);
-
-            context.Courses.RemoveRange(authorToRemove.Courses);
-            context.Authors.Remove(authorToRemove); 
-            // this will cause an exception bc of foreign key constraint
-            // there are existing courses with that author id
-            // sql server won't allow to delete in this state
-
             context.SaveChanges();
 
+            //var courseToEdit = context.Courses.Find(4); // same as Single(c => c.Id == 4)
+            //    // can also pass and find by composite keys like .Find(4, 1);
+            //courseToEdit.Name = "New Name";
+            //courseToEdit.AuthorId = 2;
 
-            // Working with Change Tracker
-            // Add an object
-            context.Authors.Add(new Author { Name = "New Author" });
+            //// you have to load object 1st, before you can change them
+            //// because ChangeTracker needs the object to update state
 
-            // Update an object
-            var author = context.Authors.Find(3);
-            author.Name = "Updated";
+            //var courseToRemove = context.Courses.Find(6);
+            //context.Courses.Remove(courseToRemove);
 
-            // Remove an object
-            var another = context.Authors.Find(4);
-            context.Authors.Remove(another);
+            ////var authorToRemove = context.Authors.Find(2);
+            //// if you want to remove author you have to bring in Courses as well.
+            //var authorToRemove = context.Authors
+            //    .Include(a => a.Courses)
+            //    .Single(a => a.Id == 2);
 
-            var entries = context.ChangeTracker.Entries();  // can also use .Entries<Author>() to be author entries
+            //context.Courses.RemoveRange(authorToRemove.Courses);
+            //context.Authors.Remove(authorToRemove); 
+            //// this will cause an exception bc of foreign key constraint
+            //// there are existing courses with that author id
+            //// sql server won't allow to delete in this state
 
-            foreach (var entry in entries)
-            {
-                entry.Reload();
-                Console.WriteLine(entry.State);
-            }
+            //context.SaveChanges();
+
+
+            //// Working with Change Tracker
+            //// Add an object
+            //context.Authors.Add(new Author { Name = "New Author" });
+
+            //// Update an object
+            //var author = context.Authors.Find(3);
+            //author.Name = "Updated";
+
+            //// Remove an object
+            //var another = context.Authors.Find(4);
+            //context.Authors.Remove(another);
+
+            //var entries = context.ChangeTracker.Entries();  // can also use .Entries<Author>() to be author entries
+
+            //foreach (var entry in entries)
+            //{
+            //    entry.Reload();
+            //    Console.WriteLine(entry.State);
+            //}
         
         }
     }
