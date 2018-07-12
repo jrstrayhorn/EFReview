@@ -1,110 +1,63 @@
-﻿Loading Related Objects
+﻿Use DBContext
 
-There are 3 ways -
-	- Lazy Loading
-	- Eager Loading
-	- Explicit Loading
+Change Tracker
+	Responsible for keeping track of state of objects in DbContext
 
-In order to get lazy loading you have to setup your navigational properties like so...
-	public virtual ICollection<Tag> Tags { get; set; }
+New - Marks as Added
+Edit - Marks as Modified
+Remove - Marks as Deleted
 
-At runtime EF creates dynamic proxy
-CourseProxy - class looks like original Coure call.. will override tag property like so..
+No modification in db yet, only in memory
 
-if (_tags == null)
-	_tags = context.LoadTags();
+Once SaveChagnes() is called, EF looks at state of objects in memory
+then generates the SQL necessary to make database changes.
 
-	return _tags;
+Once changes commit, changeTracker changes back to Unchanged
 
-1st time access because null will be initialized any time after
-we will get in memory tags
+Adding
+Modifying
+Removing Objects
 
-In Debug, EF will load related items via lazy loading
+=================
+Removing Objects
+=================
 
-Best Practices
-- Use when loading an object graph is costly (a delay in app startup)
-	- use lazy loading to only load main objects then load related objects when necessary
-- Avoid in web applications
-	- Because we always get new request/response data.. will cause unnessary round trip
-	- Disable lazy load by setting to NOT be virtual
+2 Types of Remove
 
-To turn off in DbContext do this,
-	in constructor of DbContext,
+1. With Cascade Delete
 
-	this.Configuration.LazyLoadingEnabled = false;
+	Course -> (*) Tag (would delete course and all tags associated)
 
-Avoid using virtual to define related objects
+2. Without Cascade Delete
 
-=============================
-N + 1 Issue
-=============================
+	Author -> (*) Course
 
-N + 1 - To get N entites and their related entites, we'l end up with N + 1 queries
-
-How this happens:
-	Use EF to get all courses like this context.Courses.ToList();
-
-	Then iterate over the courses and get Author name like this
-		foreach (var course in Courses)
-			course.Author.Name
-	For each course item there will be another call to Database to get author info
-		because Lazy Loading is turned on and we don't have Author info during initial Courses call
-
-Be careful with Lazy Loading.. watch out for unnecessary queries
-
-===============================
-Eager Loading
+==============================
+DB Best Practices
 ==============================
 
-Is opposite of Lazy Loading to prevent additioanl queries from Database
+Prefer logical deletes to physical deletes.
+	author.IsDeleted = true;
 
-HOw to do:
-	var courses = context.Courses.Include("Author").ToList();
-		the query will join the courses table to get courses and authors
-		but this is a bad coding practice because of magic string
+==============================
+Working with Change Tracker
+==============================
 
-	Better way
-	using System.Data.Entity;
+This is good to know if you want to understand whats happening under the hood
+or
+If you want to implement an audit trail, audit tracking
 
-	var courses = context.Courses.Include(c => c.Author).ToList();
+context.ChangeTracker.Entries() returns list of DbEntityEntry
 
-Multiple Levels
+DbEntityEntry object
+	CurrentValues - current property names being worked for entity
+			use PropertyName as indexers to get values
+		entry.CurrentValues["Name"] will get value
+		entry.CurrentValues["Id"] will get Id
 
-// all courses with their authors
-// for single properties
-context.Courses.Include(c => c.Author.Address);
+	Entity - the actual entity being used
 
-// for collection properties
-context.Courses.Include(a => a.Tags.Select(t => t.Moderator));
+	OriginalValues - original property values (in case of an edit)
+		entry.OriginalValues["Name"]
 
-can be good and bad
-
-Too Many Includes is BAD.. storing object that you don't need
-
-Decide when to use Eager vs Lazy Loading
-
-=================================
-Explicit Loading
-=================================
- 
-Eager Loading
-- Uses JOINS
-- One Round-Trip
-
-Explicit
-- Separarte queries
-- Multiple Round-Trips
-
-// MSDN way
-context.Entry(author).Collection(a => a.Courses).Load();
-
-// MOSH way
-context.Courses.Where(c => c.AuthorId == author.Id && c.FullPrice == 0).Load();
-
-var authors = context.Authors.ToList();
-var authorIds = authors.Select(a => a.Id);
-
-context.Courses.Where(c => authorIds.Contains(c.AuthorId) && c.FullPrice == 0).Load();
-
-
-
+	State - Added, Removed, Modified
