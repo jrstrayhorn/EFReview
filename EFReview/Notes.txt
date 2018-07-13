@@ -1,1 +1,90 @@
-﻿
+﻿=================================
+Repository Pattern
+=================================
+
+Repository
+	Mediates between the domain and data
+	mapping layers, acting like an **in-memory
+	collection** of domain objects.
+		PoEAA by Martin Fowler
+			Patterns of Enterprise Application Architecture
+
+Benefits
+	- Minimizes duplicate query logic
+		need to get top 5 courses w/o course
+			duplicate query logic all over the place
+				can encapsulate into repository
+	- Decouples your application from persistence frameworks
+		if you switch, do so with minimal impact
+	On average, we get a new O/RM every 2 years
+		- ADO.NET
+		- LINQ to SQL
+		- EF v1
+		- nHibernate
+		- EF v4
+		- EF v4: DbContext
+		- EF Core
+		- Dapper
+		- ORMList
+		- PetaPocos
+	- Want freedom to explore other options
+	- Promotes testability
+		partially true
+		new dbcontext have interface that can mock to unit test application
+
+In a Nutshell
+
+Add(obj)
+Remove(obj)
+Get(id)
+GetAll()
+Find(predicate)
+
+- no method called update is found.. why?
+
+- because we want this to act like an **in-memory** collection of objects
+	there is no List.update() or array.update()
+	you just List.Add(obj)
+
+	var course = collection.Get(1);
+	course.Name = "New Name";
+
+	// NO collection.Update(course);
+
+- no db semantics, just a collection no update or save
+
+How are we going to save these objects to the database?????
+
+Unit of Work Pattern
+	Maintains a list of objects affected by a
+	business transaction and coordinates the
+	writing out of changes.
+		POEAA by Martin Fowler
+
+Enity Framework
+	some say Repository and Unit of Work is already in EF
+
+	<<repository>>			<< unit of work >>
+		DbSet					DbContext
+	Add(obj)				DbSet
+	Remove(obj)				DbSet
+	Find(id)				DbSet
+	Where(predicate)		SaveChanges()
+
+on surface, yes EF, DBset, DbContext looks like Repository and UofW
+
+Repository
+	- minizes duplicate query logic
+		DbSet return IQueryables that have to be duplicated
+		DbContext is everywhere and fat LINQ queries repeated all over the place
+		could use extension methods - but existing linq methods still return iQueryable
+		and could write new queries
+
+		repo.GetTopSellingCourses() - encapsulated in repo
+			implementation detail
+	- decouples app from persistence framework
+		if use dbset and dbcontext we are TIGHTLY coupled to EF.. period
+
+	but if app code calls methods from Repository and EF details are hidden away
+	in the future we could set Repository to use any other ORM without changing
+	app code at all
