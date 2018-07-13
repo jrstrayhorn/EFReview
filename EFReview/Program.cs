@@ -40,10 +40,108 @@ namespace EFReview
                 //AddTagToVideo(2, "Comedy");
                 //AddTagToVideo(2, "Drama");
 
+                //4- Remove the "comedy" tag from the video with Id 2 (The Godfather)
+                //RemoveTagFromVideo(2, "Comedy");
+
+                //5- Remove the video with Id 2 (The Godfather)
+                //RemoveVideo(2);
+
+                //6- Remove the genre with Id 2 (Action).  Ensure all videos with this genre
+                // are deleted from the database.
+                //RemoveGenre(2);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+        }
+
+        private static void RemoveGenre(int genreId)
+        {
+            if (genreId <= 0)
+            {
+                throw new InvalidOperationException("Please enter a valid genre Id");
+            }
+
+            using (var context = new VidzyContext())
+            {
+                var genre = context.Genres
+                    .Include(g => g.Videos)
+                    .SingleOrDefault(g => g.Id == genreId);
+
+                if (genre == null)
+                {
+                    throw new ArgumentNullException("Genre does not exist.");
+                }
+
+                // removing Genre's videos FIRST
+                context.Videos.RemoveRange(genre.Videos);
+
+                // THEN removing Genre
+                context.Genres.Remove(genre);
+
+                context.SaveChanges();
+            }
+        }
+
+        private static void RemoveVideo(int videoId)
+        {
+            if (videoId <= 0)
+            {
+                throw new InvalidOperationException("Please enter a valid video Id");
+            }
+
+            using (var context = new VidzyContext())
+            {
+                var video = context.Videos.Find(videoId);
+
+                if (video == null)
+                {
+                    throw new ArgumentNullException("Video does not exist.");
+                }
+
+                context.Videos.Remove(video);
+
+                context.SaveChanges();
+            }
+        }
+
+        private static void RemoveTagFromVideo(int videoId, string tagName)
+        {
+            if (videoId <= 0)
+            {
+                throw new InvalidOperationException("Please enter a valid video Id");
+            }
+
+            if (string.IsNullOrWhiteSpace(tagName))
+            {
+                throw new InvalidOperationException("Please enter a valid tag name");
+            }
+
+            using (var context = new VidzyContext())
+            {
+                var video = context.Videos.Include(v => v.Tags).SingleOrDefault(v => v.Id == videoId);
+
+                if (video == null)
+                {
+                    throw new ArgumentNullException("Video does not exists.");
+                }
+
+                if (!video.Tags.Select(t => t.Name).Contains(tagName))
+                {
+                    throw new InvalidOperationException("Tag does not exist on Video.");
+                }
+
+                var tag = context.Tags.SingleOrDefault(t => t.Name == tagName);
+
+                if (tag == null)
+                {
+                    throw new ArgumentNullException("Tag does not exist in database.");
+                }
+
+                video.Tags.Remove(tag);
+
+                context.SaveChanges();
             }
         }
 
