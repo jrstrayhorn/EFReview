@@ -12,51 +12,137 @@ namespace EFReview
     {
         static void Main(string[] args)
         {
-            var context = new VidzyContext();
-
-            //var allVideos = context.Videos.ToList();
-
-            //foreach (var v in allVideos)
-            //{
-            //    // this causes a null reference exception
-            //    // why? Because you didn't eager load the videos
-            //    // with their genres and lazy loading is not on currently
-            //    Console.WriteLine($"Name: {v.Name}, Genre: {v.Genres.Name}");
-            //}
-
-            //// Setting Genre to virtual gets this to work now
-            //// but we've introduced the N + 1 issue
-            //// where EF is making N + 1 calls to database
-            //// 1 to get all videos then 1 call per video being iterated
-            //// to get genre
-            //var allVideos = context.Videos.ToList();
-
-            //foreach (var v in allVideos)
-            //{
-            //    Console.WriteLine($"Name: {v.Name}, Genre: {v.Genres.Name}");
-            //}
-
-            // turned off lazy loading via constructor of dbContext
-            // so above will fail with null exception
-            // using eager loading now to solve N + 1 issue
-            //var allVideos = context.Videos.Include(v => v.Genres).ToList();
-
-            //// with eager loading enabled this will now work
-            //foreach (var v in allVideos)
-            //{
-            //    Console.WriteLine($"Name: {v.Name}, Genre: {v.Genres.Name}");
-            //}
-
-            // using explicit loading to solve N+1 issue
-            var allVideos = context.Videos.ToList();
-            var genreIds = allVideos.Select(v => v.GenreId);
-
-            context.Genres.Where(g => genreIds.Contains(g.Id)).Load();
-
-            // with explicit loading enabled this will now work
-            foreach (var v in allVideos)
+            try
             {
-                Console.WriteLine($"Name: {v.Name}, Genre: {v.Genres.Name}");
+                /*1- Add a new video called “Terminator 1” with genre Action, 
+                 * release date 26 Oct, 1984, and Silver classification. 
+                 * Ensure the Action genre is not duplicated in the Genres table.
+                 */
+                //AddNewVideo("Terminator 1", "Action", new DateTime(1984, 10, 26), Classification.Silver);
+                //Console.WriteLine("***New Video Added Successfully***");
+
+                /*2- Add two tags “classics” and “drama” to the database. 
+                 * Ensure if your method is called twice, 
+                 * these tags are not duplicated.
+                 */
+                //AddNewTag("Classics");
+                //AddNewTag("Drama");
+                //AddNewTag("Drama");
+                //Console.WriteLine("***New Tags Added Successfully***");
+
+                /*3- Add three tags “classics”, “drama” and “comedy” to the video with Id 2 
+                 * (The Godfather). Ensure the “classics” and “drama” tags are not 
+                 * duplicated in the Tags table. Also, ensure that if your method 
+                 * is called twice, these tags are not duplicated in VideoTags table.
+                 */
+                //AddTagToVideo(2, "Classics");
+                //AddTagToVideo(2, "Drama");
+                //AddTagToVideo(2, "Comedy");
+                //AddTagToVideo(2, "Drama");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+        }
+
+        private static void AddTagToVideo(int videoId, string tagName)
+        {
+            if (videoId <= 0)
+            {
+                throw new InvalidOperationException("Please enter a valid video Id");
+            }
+
+            if (string.IsNullOrWhiteSpace(tagName))
+            {
+                throw new InvalidOperationException("Please enter a valid tag name");
+            }
+
+            using (var context = new VidzyContext())
+            {
+                var video = context.Videos.Include(v => v.Tags).SingleOrDefault(v => v.Id == videoId);
+
+                if (video == null)
+                {
+                    throw new ArgumentNullException("Video does not exists.");
+                }
+
+                var tagAlreadyExistsInDB = context.Tags.Any(t => t.Name == tagName);
+
+                if (tagAlreadyExistsInDB && video.Tags.Select(t => t.Name).Contains(tagName))
+                {
+                    throw new InvalidOperationException("Tag has already been added to Video.");
+                }
+
+                if (!tagAlreadyExistsInDB)
+                {
+                    AddNewTag(tagName);
+                }
+
+                var tag = context.Tags.Single(t => t.Name == tagName);
+                video.Tags.Add(tag);
+
+                context.SaveChanges();
+            }
+        }
+
+        private static void AddNewTag(string tagName)
+        {
+            if (string.IsNullOrWhiteSpace(tagName))
+            {
+                throw new ArgumentException("Please enter a tag name.");
+            }
+
+            using (var context = new VidzyContext())
+            {
+                if (context.Tags.Any(t => t.Name == tagName))
+                {
+                    throw new InvalidOperationException("You cannot create duplicate tags.");
+                }
+
+                var newTag = new Tag
+                {
+                    Name = tagName
+                };
+
+                context.Tags.Add(newTag);
+
+                context.SaveChanges();
+            }
+        }
+
+        private static void AddNewVideo(string videoName, string genreName, DateTime releaseDate, Classification classification)
+        {
+            if (string.IsNullOrWhiteSpace(videoName))
+            {
+                throw new ArgumentException("Please enter a video name.");
+            }
+
+            if (string.IsNullOrWhiteSpace(genreName))
+            {
+                throw new ArgumentException("Please enter a genre name.");
+            }
+
+            using (var context = new VidzyContext())
+            {
+                var genre = context.Genres.SingleOrDefault(g => g.Name == genreName.Trim());
+                if (genre == null)
+                {
+                    throw new InvalidOperationException("Genre does not exist. Please try again with a genre that exists.");
+                }
+
+                var newVideo = new Video
+                {
+                    Name = videoName,
+                    Genres = genre,
+                    ReleaseDate = releaseDate,
+                    Classification = classification,
+                };
+
+                context.Videos.Add(newVideo);
+
+                context.SaveChanges();
             }
         }
     }
