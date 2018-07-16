@@ -88,3 +88,58 @@ Repository
 	but if app code calls methods from Repository and EF details are hidden away
 	in the future we could set Repository to use any other ORM without changing
 	app code at all
+
+Just asking repository for the data.. app doesn't care how to get the data
+
+DbSet/Context - seems like Repository/UofW but not really
+
+Highly recommend reading Clean Architecutre
+	The architecture should be independent of frameworks
+	using patterns help you decouple from frameworks
+
+Be pragmatic.. keep it simple
+	Simplicity is the ultimate sophistication - Da Vinci
+
+Not One Size Fits All
+	Not ever application needs this... don't over engineer
+
+requirements rapidly changing.. not sure if app would make production
+
+Use patterns only when you need them..
+
+=============================
+Implementing Repository
+=============================
+
+Here what you need...
+
+Generic
+
+IRepository - interface for collection of objects in memory
+	Add()
+	Remove()
+	Get(id)
+	Find(predicate)
+
+Repository - concrete implementation
+
+Each entity has a repository
+
+	ICourseRepository 
+		anything not in generic repository
+			GetTopSellingCourses()
+			GetCoursesWithAuthors() // using eager loading
+
+	CourseRepository - derives from Generic Repository
+
+	Biz Logic/Service Layer calls into Repo
+
+IUnitOfWork - interface specific to application
+	expose Repos
+		ICoursseRepository Courses { get; }
+
+		IAuthorRepository Authors { get; }
+		
+		void Complete(); // completion of unit of work
+
+UnitOfWork - concerte  implementation
